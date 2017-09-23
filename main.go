@@ -75,7 +75,7 @@ func main() {
 	content, err := ioutil.ReadFile(configfile)
 	if err != nil {
 		item := gofred.NewItem("Reading config file error", "Modify Configuration", noAutocomplete).
-			AddIcon("plus.png", "").Executable(configfile)
+			AddIcon("modify.png", "").Executable(configfile)
 		item.VarMap = make(map[string]string)
 		item.VarMap["cmd"] = "filewrite"
 
@@ -88,7 +88,7 @@ func main() {
 	err = yaml.Unmarshal(content, &conf)
 	if err != nil {
 		item := gofred.NewItem("Parsing config file error", "Modify Configuration", noAutocomplete).
-			AddIcon("plus.png", "").Executable(configfile)
+			AddIcon("modify.png", "").Executable(configfile)
 		item.VarMap = make(map[string]string)
 		item.VarMap["cmd"] = "filewrite"
 
@@ -109,8 +109,8 @@ func main() {
 	}
 	if len(selected) == 0 {
 		response.AddMatchedItems(flag.Arg(0), configItems...)
-		item := gofred.NewItem("Modify configuration", noSubtitle, noAutocomplete).
-			AddIcon("plus.png", "").Executable(configfile)
+		item := gofred.NewItem("Modify Configuration", noSubtitle, noAutocomplete).
+			AddIcon("modify.png", "").Executable(configfile)
 		item.VarMap = make(map[string]string)
 		item.VarMap["cmd"] = "filewrite"
 		response.AddItems(item)

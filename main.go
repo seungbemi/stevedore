@@ -74,12 +74,8 @@ func main() {
 	response := gofred.NewResponse()
 	content, err := ioutil.ReadFile(configfile)
 	if err != nil {
-		item := gofred.NewItem("Reading config file error", "Modify Configuration", noAutocomplete).
-			AddIcon("modify.png", "").Executable(configfile)
-		item.VarMap = make(map[string]string)
-		item.VarMap["cmd"] = "filewrite"
-
-		response.AddItems(item)
+		response.AddItems(gofred.NewItem("Reading config file error", "Modify Configuration", noAutocomplete).
+			AddIcon("modify.png", "").Executable(configfile).AddVariables(gofred.NewVariable("cmd", "filewrite")))
 		fmt.Println(response)
 		return
 	}
@@ -87,19 +83,14 @@ func main() {
 	conf := make(map[string]Config)
 	err = yaml.Unmarshal(content, &conf)
 	if err != nil {
-		item := gofred.NewItem("Parsing config file error", "Modify Configuration", noAutocomplete).
-			AddIcon("modify.png", "").Executable(configfile)
-		item.VarMap = make(map[string]string)
-		item.VarMap["cmd"] = "filewrite"
-
-		response.AddItems(item)
+		response.AddItems(gofred.NewItem("Parsing config file error", "Modify Configuration", noAutocomplete).
+			AddIcon("modify.png", "").Executable(configfile).AddVariables(gofred.NewVariable("cmd", "filewrite")))
 		fmt.Println(response)
 		return
 	}
-	response.VarMap = make(map[string]string)
+
 	configItems := []gofred.Item{}
 	selected := ""
-
 	for name, config := range conf {
 		if flag.Arg(0) == name {
 			selected = name
@@ -109,16 +100,13 @@ func main() {
 	}
 	if len(selected) == 0 {
 		response.AddMatchedItems(flag.Arg(0), configItems...)
-		item := gofred.NewItem("Modify Configuration", noSubtitle, noAutocomplete).
-			AddIcon("modify.png", "").Executable(configfile)
-		item.VarMap = make(map[string]string)
-		item.VarMap["cmd"] = "filewrite"
-		response.AddItems(item)
+		response.AddItems(gofred.NewItem("Modify Configuration", noSubtitle, noAutocomplete).
+			AddIcon("modify.png", "").Executable(configfile).AddVariables(gofred.NewVariable("cmd", "filewrite")))
 		fmt.Println(response)
 		return
 	}
 
-	response.VarMap["cmd"] = "bash"
+	response.AddVariable("cmd", "bash")
 	items := []gofred.Item{}
 	comp := compose{}
 	if exists(conf[selected].FilePath) {
@@ -130,10 +118,7 @@ func main() {
 		}
 	} else {
 		item := gofred.NewItem("Can not read docker-compose file", "Set docker-compose file path", noAutocomplete).
-			AddIcon("plus.png", "").Executable(configfile)
-		item.VarMap = make(map[string]string)
-		item.VarMap["cmd"] = "filewrite"
-
+			AddIcon("plus.png", "").Executable(configfile).AddVariables(gofred.NewVariable("cmd", "filewrite"))
 		response.AddItems(item)
 		fmt.Println(response)
 		return
@@ -171,16 +156,12 @@ func main() {
 	}
 
 	{
-		baseItem := gofred.NewItem("All Services", "create & start all services up", noAutocomplete).
+		items = append(items, gofred.NewItem("All Services", "create & start all services up", noAutocomplete).
 			AddIcon("docker.png", "").Executable(baseCommand+"up -d").
 			AddOptionKeyAction("Recreate and start all services", baseCommand+"up --force-recreate -d", true).
-			AddCommandKeyAction("Stop all services conatainers", baseCommand+"stop", true)
-		logItem := gofred.NewItem("Check logs on terminal", "Open terminal and show logs", noAutocomplete).
-			AddIcon("docker.png", "").Executable(baseCommand + "logs -f -t")
-		logItem.VarMap = make(map[string]string)
-		logItem.VarMap["cmd"] = "terminal"
-
-		items = append(items, baseItem, logItem)
+			AddCommandKeyAction("Stop all services conatainers", baseCommand+"stop", true),
+			gofred.NewItem("Check logs on terminal", "Open terminal and show logs", noAutocomplete).
+				AddIcon("docker.png", "").Executable(baseCommand+"logs -f -t").AddVariables(gofred.NewVariable("cmd", "terminal")))
 	}
 
 	for _, service := range services {

@@ -20,6 +20,13 @@ const (
 	noArg          = ""
 	noAutocomplete = ""
 )
+const (
+	iconModify     = "modify.png"
+	iconServiceOn  = "On.png"
+	iconServiceOff = "Off.png"
+	iconDefault    = "icon.png"
+	iconDocker     = "docker.png"
+)
 
 type compose struct {
 	Services map[string]interface{}
@@ -75,7 +82,7 @@ func main() {
 	content, err := ioutil.ReadFile(configfile)
 	if err != nil {
 		response.AddItems(gofred.NewItem("Reading config file error", "Modify Configuration", noAutocomplete).
-			AddIcon("modify.png", "").Executable(configfile).AddVariables(gofred.NewVariable("cmd", "filewrite")))
+			AddIcon(iconModify, "").Executable(configfile).AddVariables(gofred.NewVariable("cmd", "filewrite")))
 		fmt.Println(response)
 		return
 	}
@@ -84,7 +91,7 @@ func main() {
 	err = yaml.Unmarshal(content, &conf)
 	if err != nil {
 		response.AddItems(gofred.NewItem("Parsing config file error", "Modify Configuration", noAutocomplete).
-			AddIcon("modify.png", "").Executable(configfile).AddVariables(gofred.NewVariable("cmd", "filewrite")))
+			AddIcon(iconModify, "").Executable(configfile).AddVariables(gofred.NewVariable("cmd", "filewrite")))
 		fmt.Println(response)
 		return
 	}
@@ -95,13 +102,13 @@ func main() {
 		if flag.Arg(0) == name {
 			selected = name
 		} else {
-			configItems = append(configItems, gofred.NewItem("Select #"+name, config.FilePath, name).AddIcon("docker.png", ""))
+			configItems = append(configItems, gofred.NewItem("Select #"+name, config.FilePath, name).AddIcon(iconDocker, ""))
 		}
 	}
 	if len(selected) == 0 {
 		response.AddMatchedItems(flag.Arg(0), configItems...)
 		response.AddItems(gofred.NewItem("Modify Configuration", noSubtitle, noAutocomplete).
-			AddIcon("modify.png", "").Executable(configfile).AddVariables(gofred.NewVariable("cmd", "filewrite")))
+			AddIcon(iconModify, "").Executable(configfile).AddVariables(gofred.NewVariable("cmd", "filewrite")))
 		fmt.Println(response)
 		return
 	}
@@ -113,12 +120,12 @@ func main() {
 		content, err := ioutil.ReadFile(conf[selected].FilePath)
 		err = yaml.Unmarshal(content, &comp)
 		if err != nil {
-			Message(response, "Can not parse docker-compose file", "please check if yaml file is well written", true)
+			Message(response, "Can not parse docker-compose file", "Please check yaml file : "+conf[selected].FilePath, true)
 			return
 		}
 	} else {
-		item := gofred.NewItem("Can not read docker-compose file", "Set docker-compose file path", noAutocomplete).
-			AddIcon("plus.png", "").Executable(configfile).AddVariables(gofred.NewVariable("cmd", "filewrite"))
+		item := gofred.NewItem("Can not read docker-compose file", "Modify Configuration", noAutocomplete).
+			AddIcon(iconModify, "").Executable(configfile).AddVariables(gofred.NewVariable("cmd", "filewrite"))
 		response.AddItems(item)
 		fmt.Println(response)
 		return
@@ -157,11 +164,11 @@ func main() {
 
 	{
 		items = append(items, gofred.NewItem("All Services", "create & start all services up", noAutocomplete).
-			AddIcon("docker.png", "").Executable(baseCommand+"up -d").
+			AddIcon(iconDocker, "").Executable(baseCommand+"up -d").
 			AddOptionKeyAction("Recreate and start all services", baseCommand+"up --force-recreate -d", true).
 			AddCommandKeyAction("Stop all services conatainers", baseCommand+"stop", true),
 			gofred.NewItem("Check logs on terminal", "Open terminal and show logs", noAutocomplete).
-				AddIcon("docker.png", "").Executable(baseCommand+"logs -f -t").AddVariables(gofred.NewVariable("cmd", "terminal")))
+				AddIcon(iconDocker, "").Executable(baseCommand+"logs -f -t").AddVariables(gofred.NewVariable("cmd", "terminal")))
 	}
 
 	for _, service := range services {
@@ -172,11 +179,11 @@ func main() {
 
 		if running {
 			items = append(items, gofred.NewItem(service, "Stop service", noAutocomplete).
-				AddIcon("On.png", "").Executable(baseCommand+"stop "+service).
+				AddIcon(iconServiceOn, "").Executable(baseCommand+"stop "+service).
 				AddOptionKeyAction("Recreate and start service", baseCommand+"up --force-recreate -d "+service, true))
 		} else {
 			items = append(items, gofred.NewItem(service, "Start service", noAutocomplete).
-				AddIcon("Off.png", "").
+				AddIcon(iconServiceOff, "").
 				Executable(baseCommand+"up -d "+service).
 				AddOptionKeyAction("Recreate and start service", baseCommand+"up --force-recreate -d "+service, true))
 		}

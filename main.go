@@ -83,8 +83,16 @@ func main() {
 	if !strings.Contains(path, "/usr/local/bin") {
 		os.Setenv("PATH", path+":/usr/local/bin")
 	}
+	configPath := os.Getenv("alfred_workflow_data")
 	response := gofred.NewResponse()
-	content, err := ioutil.ReadFile(configfile)
+
+	err := os.MkdirAll(configPath, os.ModePerm)
+	if err != nil {
+		Message(response, "error", err.Error(), true)
+		return
+	}
+
+	content, err := ioutil.ReadFile(configPath + "/" + configfile)
 	if err != nil {
 		response.AddItems(gofred.NewItem("Reading config file error", "Modify Configuration", noAutocomplete).
 			AddIcon(iconModify, "").Executable(configfile).AddVariables(gofred.NewVariable("cmd", file)))

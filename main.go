@@ -3,7 +3,6 @@ package main
 import (
 	"flag"
 	"fmt"
-	"gofred"
 	"io/ioutil"
 	"log"
 	"net"
@@ -12,6 +11,7 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/seungbemi/gofred"
 	"gopkg.in/yaml.v2"
 )
 

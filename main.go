@@ -29,6 +29,7 @@ const (
 )
 const (
 	file     = "filewrite"
+	modify   = "modify"
 	bash     = "bash"
 	terminal = "terminal"
 )
@@ -94,7 +95,7 @@ func main() {
 
 	content, err := ioutil.ReadFile(configPath + "/" + configfile)
 	if err != nil {
-		response.AddItems(gofred.NewItem("Reading config file error", "Modify Configuration", noAutocomplete).
+		response.AddItems(gofred.NewItem("Configure stevedore", "new configuration", noAutocomplete).
 			AddIcon(iconModify, "").Executable(configfile).AddVariables(gofred.NewVariable("cmd", file)))
 		fmt.Println(response)
 		return
@@ -104,7 +105,7 @@ func main() {
 	err = yaml.Unmarshal(content, &conf)
 	if err != nil {
 		response.AddItems(gofred.NewItem("Parsing config file error", "Modify Configuration", noAutocomplete).
-			AddIcon(iconModify, "").Executable(configfile).AddVariables(gofred.NewVariable("cmd", file)))
+			AddIcon(iconModify, "").Executable(configfile).AddVariables(gofred.NewVariable("cmd", modify)))
 		fmt.Println(response)
 		return
 	}
@@ -128,7 +129,7 @@ func main() {
 	if len(selected) == 0 {
 		response.AddMatchedItems(flag.Arg(0), configItems...)
 		response.AddItems(gofred.NewItem("Modify Configuration", noSubtitle, noAutocomplete).
-			AddIcon(iconModify, "").Executable(configfile).AddVariables(gofred.NewVariable("cmd", file)))
+			AddIcon(iconModify, "").Executable(configfile).AddVariables(gofred.NewVariable("cmd", modify)))
 		fmt.Println(response)
 		return
 	}
@@ -145,7 +146,7 @@ func main() {
 		}
 	} else {
 		item := gofred.NewItem("Can not read docker-compose file", "Modify Configuration", noAutocomplete).
-			AddIcon(iconModify, "").Executable(configfile).AddVariables(gofred.NewVariable("cmd", file))
+			AddIcon(iconModify, "").Executable(configfile).AddVariables(gofred.NewVariable("cmd", modify))
 		response.AddItems(item)
 		fmt.Println(response)
 		return
